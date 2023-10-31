@@ -1,79 +1,114 @@
 .data
-vetor: .word 3,9,2,7,-5,3, 8
-tamanho: .word 7
 n: .ascii "\n"
 
 .text
 j main
 
-end:
-ret
+vector_fill:
+#load vector size to a1 and starting vector to a3
+li a7, 5
+ecall
+#save vector size to s1
+add s1, a0, zero
+#alocate memory dinamically to s2
+mul t1, s1, s0
+add a0, t1, zero 
+li a7, 9
+ecall
+add s2, a0, zero
+#initialize iterator
+li t1, 0
+j vector_loop
+
+vector_loop:
+blt t1, s1, fill
+j end
+
+fill:
+li a7, 5
+ecall
+#fill t2 with distance from vector to number
+mul t2, t1, s0
+#new adress - a3
+add a3, t2, s2
+#save number to a3
+sw a0, 0(a3)
+#iterate t1
+addi t1, t1, 1
+j vector_loop 
 
 bubble_sort:
 #iterate j and j+1, then checks
-addi s1, s1, 4
-addi s2, s2, 4
-bge s2, s0, iterate_i
-lw t0, 0(s1)
-lw t1, 0(s2)
+addi a2, a2, 4
+addi a3, a3, 4
+bge a3, a1, iterate_i
+lw t0, 0(a2)
+lw t1, 0(a3)
 bgt t0, t1, swap
 j bubble_sort
 
 iterate_i:
 #iterate i
-addi s0, s0, -4
-addi s1, a0, -4
-mv s2, a0
-beq s0, a0 ,end
+addi a1, a1, -4
+addi a2, s2, -4
+mv a3, s2
+beq a1, s2 ,end
 j bubble_sort
 
 swap:
 #load word into temp, and save temp into adress
-sw t0, 0(s2)
-sw t1, 0(s1)
+sw t0, 0(a3)
+sw t1, 0(a2)
 j bubble_sort
 
+
+end:
+#return
+ret
+
 print_setup:
-#load array adress(t0), \n (t1), array size (a1), and initialize i (a2)
-mv t0, a0
+#load array adress(t0), \n (t1), array size (t2), and initialize i (a2)
+mv t0,s2
 la t1, n
-la t2, tamanho
-li t3, 4
-lw a1, 0(t2)
-li a2, 0
+mv t2,s1
+li t3, 0
 j print
 
 print:
-addi a2, a2, 1
-blt a2, a1, printing
+blt t3, t2, printing
 j end
 
 printing:
-mul t3, a1, t3
+#calc distance (t4) from initial adress to the next number
+mul t4, s0, t3
+add t4, t4, s2
 
+#print \n
 li a7, 4
 mv a0, t1
 ecall
+
+#print number
 li a7, 1
-add t0, t0, t3
-lw a0, 0(t0)
+lw a0, 0(t4)
 ecall
+
+addi t3, t3, 1
 
 j print
 
-
 main:
-#initialize vector and size
-la a0, vetor
-la t0, tamanho
-lw a1, 0(t0)
+#initialize word size (t0) 
+li s0, 4
+
+#fill vector
+jal vector_fill
 
 #initialize i, j and temp(j+1) for bubble sort
-li t0, 4
-mul t1, a1, t0
-add s0, a0, t1
-addi s1, a0, -4
-mv s2, a0
+mul t1, s1, s0
+add a1, s2, t1
+addi a2, s2, -4
+mv a3, s2
 
 #call bubble sort
 jal bubble_sort
