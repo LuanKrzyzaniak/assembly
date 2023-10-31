@@ -9,11 +9,7 @@ jal fill
 jal getsize
 jal vowel
 
-mv a0, s1
-li a7, 1
-ecall
-
-mv a0, s3
+mv a0, s5
 li a7, 4
 ecall
 
@@ -51,16 +47,17 @@ li t1, 0
 #load vowels adress and size
 la s3, vowels
 li s4, 5
+la s5, empty
 j vowel_loop
 
 vowel_loop:
-#if vowels are finished
-beq t3, s4, insert
 #get chars
 add t4, s2, t2
 lb a2, 0(t4)
 add t5, s3, t3
 lb a3, 0(t5)
+#if vowels are finished
+beq t3, s4, insert
 #checks
 beq a2, a3, iterate_i
 #iterates
@@ -73,10 +70,10 @@ beq t2, s1, return
 j vowel_loop
 
 insert:
-add t6, s3, t1
+add t6, s5, t1
 sb a2, 0(t6)
 addi t1, t1, 1
-j vowel_loop
+j iterate_i
 
 return:
 ret
