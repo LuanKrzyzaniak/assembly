@@ -16,7 +16,7 @@ ecall
 j end
 
 fill:
-#max lenght to 32 char
+#max length to 32 char
 li a1, 32
 la a0, full
 li a7, 8
@@ -67,6 +67,7 @@ j vowel_loop
 iterate_i:
 addi t2, t2, 1
 beq t2, s1, return
+li t3, 0
 j vowel_loop
 
 insert:
